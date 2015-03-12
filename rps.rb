@@ -38,7 +38,9 @@ loop do
   
   if computer_choice == user_choice 
     puts "Its a tie!!!" 
-  elsif (user_choice == "r" && computer_choice == "s") || (user_choice == "p" && computer_choice == "r") || (user_choice == "s" && computer_choice == "p")
+  elsif (user_choice == "r" && computer_choice == "s") || 
+    (user_choice == "p" && computer_choice == "r") || 
+    (user_choice == "s" && computer_choice == "p")
     Win_Message(user_choice,winner[0],winner[1])
     puts "You wooooooon!!"  
   else 
@@ -46,9 +48,9 @@ loop do
     puts "Ah man, the computer won. Wah wah wah..."
   end 
 
-    puts"Play again (y/n)?"
-    again = gets.chomp.downcase 
-    break if(again !="y")
+  puts"Play again (y/n)?"
+  again = gets.chomp.downcase 
+  break if again != "y"
 
 end 
 
