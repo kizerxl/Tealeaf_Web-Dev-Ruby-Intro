@@ -1,43 +1,38 @@
 #Blackjack 
 #Tealeaf Academy 
 
-suits = ["Hearts", "Diamonds", "Spades", "Clubs"]
-cards = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "ACE", "KING", "QUEEN", "JESTER"]
+SUITS = ["Hearts", "Diamonds", "Spades", "Clubs"]
+CARDS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "ACE", "KING", "QUEEN", "JESTER"]
+BLACKJACK = 21
+DEALER_HIT_LIMIT = 17
 
-user_hand = []
-dealer_hand = []
-
-#make deck of cards and shuffle 
-deck = suits.product(cards)
-deck.shuffle! 
-
-#calulates score for respective hand 
+#calculates score for respective hand 
 def calculate_score(hand_of_cards)
-  arr = hand_of_cards.map{|e| e[1]}
+  card_values = hand_of_cards.map{|card_value| card_value[1]}
   total = 0 
-  arr.each do |card| 
-    if card == "ACE"
+  card_values.each do |card_value| 
+    if card_value == "ACE"
       total+= 11
-    elsif card.to_i == 0 #For suits ie Jester, Queen
+    elsif card_value.to_i == 0 #For suits ie Jester, Queen
       total+= 10
     else 
-      total+= card.to_i
+      total+= card_value.to_i
     end
   end 
 
-  #adjust for Aces
-  arr.select{|card| card == "ACE"}.count.times do 
+#adjust for Aces
+  card_values.select{|card| card == "ACE"}.count.times do 
     total-=10 if total > 21
   end 
   total
 end 
 
 #format cards 
-def format_card(entry)
-  format = entry[1] +" of "+ entry[0]
+def format_card(card)
+  card[1] +" of "+ card[0]
 end 
 
-def start_game (user_hand, dealer_hand, deck)
+def deal_first_cards(user_hand, dealer_hand, deck)
   2.times do 
     user_hand<< deck.pop 
     dealer_hand<< deck.pop 
@@ -48,115 +43,139 @@ def insert_blank_line
   puts ""
 end 
 
-def outputcards(hand_of_cards)
+def output_cards(hand_of_cards)
   card_list = []
   hand_of_cards.each do |card| 
     card_list<< format_card(card)
   end 
-  card_list = card_list.join(", ")
+  formatted_cards = card_list.join(", ")
+end 
+
+def compare_hands(user_hand, dealer_hand, name) 
+  user_total = calculate_score(user_hand)
+  dealer_total = calculate_score(dealer_hand)
+  puts "#{name} has #{output_cards(user_hand)} with a total of #{user_total}"
+  puts "Dealer has #{output_cards(dealer_hand)} with a total of #{dealer_total}"
+
+  if user_total > dealer_total 
+    puts "#{name} wins!!!"
+    insert_blank_line
+  elsif dealer_total > user_total
+    puts "Dealer wins, you lose.."
+    insert_blank_line
+  else 
+    puts "OMG..it's a tie!!!!!"
+    insert_blank_line
+  end 
 end 
 
 #Our game 
+begin
+  user_hand = []
+  dealer_hand = []
+  win_or_bust = false 
 
-puts "What is your name?"
-name = gets.chomp
-insert_blank_line
-puts "Let's play #{name}"
-insert_blank_line
-start_game(user_hand, dealer_hand, deck)
-insert_blank_line
+  #make deck of cards and shuffle 
+  deck = SUITS.product(CARDS)
+  deck.shuffle! 
+  
+    puts "What is your name?"
+    name = gets.chomp
+    insert_blank_line
+    puts "Let's play #{name}"
+    insert_blank_line
+    deal_first_cards(user_hand, dealer_hand, deck)
+    insert_blank_line
 
-user_total = calculate_score(user_hand)
-dealer_total = calculate_score(dealer_hand)
-
-puts "#{name} has #{outputcards(user_hand)} with a total of #{user_total}"
-puts "Dealer has #{outputcards(dealer_hand)} with a total of #{dealer_total}"
-insert_blank_line
-
-if user_total == 21 
-  puts "#{name} hit blackjack! #{name} wins!!!"
-  insert_blank_line
-  exit 
-end 
-
-#User turn 
-while user_total < 21 
-  puts "#{name}, enter 1 to hit or 2 to stay:"
-  choice = gets.chomp 
-
-  if !['1','2'].include?(choice)
-    next
-  end 
-
-  if choice == '1'
-    puts "#{name} has chosen to hit"
-    user_hand<< deck.pop
     user_total = calculate_score(user_hand)
-    puts "#{name} has the following cards: #{outputcards(user_hand)}"
-    puts "with a total of #{user_total}"
-  end
+    dealer_total = calculate_score(dealer_hand)
 
-  if user_total == 21 
-    puts "#{name} hit blackjack! #{name} wins!!!"
+    puts "#{name} has #{output_cards(user_hand)} with a total of #{user_total}"
+    puts "Dealer has a total of #{dealer_total}"
     insert_blank_line
-    exit 
-  elsif user_total > 21 
-    puts "#{name} has busted. Dealer wins, you lose..."
-    insert_blank_line
-    exit 
+
+    if user_total == BLACKJACK 
+      puts "#{name} hit blackjack! #{name} wins!!!"
+      insert_blank_line
+      win_or_bust = true
+    end 
+
+    #User turn 
+    while user_total < BLACKJACK && win_or_bust == false 
+      puts "#{name}, enter 1 to hit or 2 to stay:"
+      choice = gets.chomp 
+
+      if !['1','2'].include?(choice)
+        next
+      end 
+
+      if choice == '1'
+        puts "#{name} has chosen to hit"
+        user_hand<< deck.pop
+        user_total = calculate_score(user_hand)
+        puts "#{name} has the following cards: #{output_cards(user_hand)}"
+        puts "with a total of #{user_total}"
+      end
+
+      if user_total == BLACKJACK
+        puts "#{name} hit blackjack! #{name} wins!!!"
+        insert_blank_line
+        win_or_bust = true 
+        break
+      elsif user_total > BLACKJACK 
+        puts "#{name} has busted. Dealer wins, you lose..."
+        insert_blank_line
+        win_or_bust = true
+        break 
+      end 
+
+      if choice == "2"
+        puts "#{name} has chosen to stay"
+        insert_blank_line
+        break
+      end 
+
+    end 
+
+    #Dealer turn 
+
+   if dealer_total == BLACKJACK 
+      puts "Dealer has hit blackjack. #{name} has lost.."
+      insert_blank_line
+      win_or_bust = true 
+     
+   elsif win_or_bust == false 
+     
+    while dealer_total < DEALER_HIT_LIMIT
+
+      #keep hitting 
+      dealer_hand<<deck.pop 
+      dealer_total = calculate_score(dealer_hand)
+      puts "Dealer has a total of #{dealer_total}"
+      insert_blank_line
+
+      if dealer_total == BLACKJACK
+        puts "Dealer has hit blackjack. #{name} has lost.."
+        insert_blank_line
+        win_or_bust = true 
+        break
+      elsif dealer_total > BLACKJACK
+        puts "Dealer has busted. #{name} wins!"
+        insert_blank_line
+        win_or_bust = true 
+        break
+      end
+
+    end
+
+ end 
+  
+  if win_or_bust == false 
+    compare_hands(user_hand, dealer_hand, name)
   end 
+  
+  puts "Play again? (y/n):" 
+  again = gets.chomp.downcase
 
-  if choice == "2"
-    puts "#{name} has chosen to stay"
-    insert_blank_line
-    break
-  end 
-
-end 
-
-#Dealer turn 
-
-if dealer_total == 21
-  puts "Dealer has hit blackjack. #{name} has lost.."
-  insert_blank_line
-  exit
-end 
-
-while dealer_total < 17 
-
-  #keep hitting 
-  dealer_hand<<deck.pop 
-  dealer_total = calculate_score(dealer_hand)
-  puts "Dealer has #{outputcards(dealer_hand)} with a total of #{dealer_total}"
-  insert_blank_line
-
-
-  if dealer_total == 21
-  puts "Dealer has hit blackjack. #{name} has lost.."
-  insert_blank_line
-  exit
-  elsif dealer_total > 21
-    puts "Dealer has busted. #{name} wins!"
-    insert_blank_line
-    exit
-  end
-
-end 
-
-#Compare hands 
-user_total = calculate_score(user_hand)
-dealer_total = calculate_score(dealer_hand)
-puts "#{name} has #{outputcards(user_hand)} with a total of #{user_total}"
-puts "Dealer has #{outputcards(dealer_hand)} with a total of #{dealer_total}"
-
-if user_total > dealer_total 
-  puts "#{name} wins!!!"
-  insert_blank_line
-elsif dealer_total > user_total
-  puts "Dealer wins, you lose.."
-  insert_blank_line
-else 
-  puts "OMG..it's a tie!!!!!"
-  insert_blank_line
-end 
+end while again == 'y'
 
