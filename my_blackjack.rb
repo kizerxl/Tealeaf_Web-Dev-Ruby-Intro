@@ -79,72 +79,72 @@ begin
   deck = SUITS.product(CARDS)
   deck.shuffle! 
   
-    puts "What is your name?"
-    name = gets.chomp
-    insert_blank_line
-    puts "Let's play #{name}"
-    insert_blank_line
-    deal_first_cards(user_hand, dealer_hand, deck)
-    insert_blank_line
+  puts "What is your name?"
+  name = gets.chomp
+  insert_blank_line
+  puts "Let's play #{name}"
+  insert_blank_line
+  deal_first_cards(user_hand, dealer_hand, deck)
+  insert_blank_line
 
-    user_total = calculate_score(user_hand)
-    dealer_total = calculate_score(dealer_hand)
+  user_total = calculate_score(user_hand)
+  dealer_total = calculate_score(dealer_hand)
 
-    puts "#{name} has #{output_cards(user_hand)} with a total of #{user_total}"
-    puts "Dealer has a total of #{dealer_total}"
+  puts "#{name} has #{output_cards(user_hand)} with a total of #{user_total}"
+  puts "Dealer has a total of #{dealer_total}"
+  insert_blank_line
+
+  if user_total == BLACKJACK 
+    puts "#{name} hit blackjack! #{name} wins!!!"
     insert_blank_line
-
-    if user_total == BLACKJACK 
-      puts "#{name} hit blackjack! #{name} wins!!!"
-      insert_blank_line
-      win_or_bust = true
-    end 
+    win_or_bust = true
+  end 
 
     #User turn 
-    while user_total < BLACKJACK && win_or_bust == false 
-      puts "#{name}, enter 1 to hit or 2 to stay:"
-      choice = gets.chomp 
+  while user_total < BLACKJACK && win_or_bust == false 
+    puts "#{name}, enter 1 to hit or 2 to stay:"
+    choice = gets.chomp 
 
-      if !['1','2'].include?(choice)
-        next
-      end 
-
-      if choice == '1'
-        puts "#{name} has chosen to hit"
-        user_hand<< deck.pop
-        user_total = calculate_score(user_hand)
-        puts "#{name} has the following cards: #{output_cards(user_hand)}"
-        puts "with a total of #{user_total}"
-      end
-
-      if user_total == BLACKJACK
-        puts "#{name} hit blackjack! #{name} wins!!!"
-        insert_blank_line
-        win_or_bust = true 
-        break
-      elsif user_total > BLACKJACK 
-        puts "#{name} has busted. Dealer wins, you lose..."
-        insert_blank_line
-        win_or_bust = true
-        break 
-      end 
-
-      if choice == "2"
-        puts "#{name} has chosen to stay"
-        insert_blank_line
-        break
-      end 
-
+    if !['1','2'].include?(choice)
+      next
     end 
+
+    if choice == '1'
+      puts "#{name} has chosen to hit"
+      user_hand<< deck.pop
+      user_total = calculate_score(user_hand)
+      puts "#{name} has the following cards: #{output_cards(user_hand)}"
+      puts "with a total of #{user_total}"
+    end
+
+    if user_total == BLACKJACK
+      puts "#{name} hit blackjack! #{name} wins!!!"
+      insert_blank_line
+      win_or_bust = true 
+      break
+    elsif user_total > BLACKJACK 
+      puts "#{name} has busted. Dealer wins, you lose..."
+      insert_blank_line
+      win_or_bust = true
+      break 
+    end 
+
+    if choice == "2"
+      puts "#{name} has chosen to stay"
+      insert_blank_line
+      break
+    end 
+
+  end 
 
     #Dealer turn 
 
-   if dealer_total == BLACKJACK 
-      puts "Dealer has hit blackjack. #{name} has lost.."
-      insert_blank_line
-      win_or_bust = true 
+  if dealer_total == BLACKJACK 
+    puts "Dealer has hit blackjack. #{name} has lost.."
+    insert_blank_line
+    win_or_bust = true 
      
-   elsif win_or_bust == false 
+  elsif win_or_bust == false 
      
     while dealer_total < DEALER_HIT_LIMIT
 
@@ -168,7 +168,7 @@ begin
 
     end
 
- end 
+  end 
   
   if win_or_bust == false 
     compare_hands(user_hand, dealer_hand, name)
