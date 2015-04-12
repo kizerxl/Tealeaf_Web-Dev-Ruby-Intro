@@ -18,51 +18,44 @@ class Hand
   end 
 
   def <=> (other_hand)
-    if @value == other_hand.value
+    if self.value == other_hand.value
       0
-    elsif ( (@value == "R" && other_hand.value == "S") || 
-      (@value == "P" && other_hand.value == "R")|| 
-      (@value == "S" && other_hand.value == "P") )
+    elsif ( (self.value == "R" && other_hand.value == "S") || 
+      (self.value == "P" && other_hand.value == "R")|| 
+      (self.value == "S" && other_hand.value == "P") )
       1
     else 
       -1
     end 
+  end 
 
-end 
-
-  def winning_message
-    if @value == "P"
+  def print_winning_message
+    if self.value == "P"
       puts "Paper defeats Rock"
-    elsif @value == "R"
+    elsif self.value == "R"
       puts "Rock smashed Scissors"
-    elsif @value == "S"
+    elsif self.value == "S"
       puts "Scissors just a cut a new one in paper"
     end 
-
   end 
 
   def to_s
-    Game::CHOICES[@value]
+    GameEngine::CHOICES[self.value]
   end 
-
 end 
-
 
 class Player 
   attr_accessor :name, :hand
-
   def initialize(name)
     @name = name
   end
 
   def to_s 
-    "#{self.name} plays #{self.hand}"
+    "#{name} plays #{hand}"
   end 
-
 end 
 
-class HumanPlayer < Player
-  
+class Human < Player
   def initialize(name= "user")
     super
   end
@@ -71,35 +64,28 @@ class HumanPlayer < Player
     begin 
       puts "Please select R for Rock, P for Paper and S for Scissors"
       choice = gets.chomp.upcase 
-    end until Game::CHOICES.keys.include?(choice)
+    end until GameEngine::CHOICES.keys.include?(choice)
 
     @hand = Hand.new(choice)
   end 
-
-
-
 end 
 
 class Computer < Player
-  
-  def initialize(name= "Computer") 
+    def initialize(name= "Computer") 
     super(name)
   end 
 
   def play 
-    @hand = Hand.new(Game::CHOICES.keys.sample)
+    self.hand = Hand.new(GameEngine::CHOICES.keys.sample)
   end 
-
 end 
 
-#our engine 
-class Game 
-  
-  CHOICES = {"R" => "Rock", "P" => "Paper", "S" => "Scissors"}
+class GameEngine 
+    CHOICES = {"R" => "Rock", "P" => "Paper", "S" => "Scissors"}
   attr_accessor :human, :computer
   def initialize()
-    @human = HumanPlayer.new()
-    @computer = Computer.new()
+    @human = Human.new
+    @computer = Computer.new
   end 
 
   def get_winner
@@ -108,21 +94,18 @@ class Game
     if human.hand == computer.hand 
       puts "Its a tie!"
     elsif human.hand > computer.hand 
-      human.hand.winning_message 
+      human.hand.print_winning_message 
       puts "#{human.name} WINS!"
     else
-      computer.hand.winning_message
+      computer.hand.print_winning_message
       puts "#{human.name} loses..."
     end
-
   end 
   
   def start
     puts "Let's play Paper, Rock, Scissors"
     puts "What is your name?"
-    your_name = gets.chomp
-    human.name = your_name 
-
+    human.name = gets.chomp
     begin 
       human.play 
       computer.play 
@@ -130,12 +113,8 @@ class Game
       puts "\nPlay again(y/n):"
       again = gets.chomp.upcase 
     end until again != "Y"
-
   end 
-
-
 end  
 
-#Run game 
-new_game = Game.new.start
+GameEngine.new.start
 
