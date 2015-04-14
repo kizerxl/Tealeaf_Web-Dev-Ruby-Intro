@@ -71,7 +71,7 @@ end
 
 class Computer < Player
   def initialize(name="Computer") 
-    super(name)
+    super
   end 
 
   def play 
@@ -112,7 +112,8 @@ class GameEngine
   def start
     puts "Let's play Paper, Rock, Scissors"
     puts "What is your name?"
-    human.name = gets.chomp
+    name = gets.chomp
+    human.name = name if !name.empty?   
     begin 
       human.play 
       computer.play 
