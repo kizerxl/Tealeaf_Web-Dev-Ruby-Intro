@@ -3,7 +3,6 @@
 # One player is the computer and the other is a user 
 # There is a game board that is updated and checked for a winner
 # each turn 
-
 class Player
   attr_reader :name, :sign 
   def initialize(name, sign)
@@ -76,9 +75,7 @@ class Board
 
   def reset_board
     @board.each{ |_, tile| tile.sign_tile(" ")}
-    
   end 
-
 end 
 
 class Tile 
@@ -106,7 +103,7 @@ class GameEngine
     name = gets.chomp
     @again = ''
     @new_board = Board.new
-    @human = Human.new(name,"X")
+    @human = Human.new(name)
     @computer = Computer.new
     @current_player = @human
   end 
@@ -119,7 +116,7 @@ class GameEngine
         choice = gets.chomp.to_i
       end until @new_board.free_tile_positions.include?(choice) 
     else
-        choice = @new_board.free_tile_positions.sample
+      choice = @new_board.free_tile_positions.sample
     end
     @new_board.sign_board(choice, @current_player.sign)
   end 
@@ -133,11 +130,12 @@ class GameEngine
   end 
 
   def display_win_or_tie_message?
-    if @new_board.all_tiles_filled?
+    if @new_board.all_tiles_filled? && 
+    !@new_board.have_a_winner?(@current_player.sign)
       puts"Looks like it's a tie.."
     elsif @current_player == @human 
       puts "#{@current_player.name} wins!"
-    else 
+    else
       puts "#{@current_player.name} wins, you lose...." 
     end 
   end
@@ -171,8 +169,8 @@ class GameEngine
       display_win_or_tie_message?
       play_again?
     end until @again != "y"
-      puts "Thanks for playing"
-    end 
+    puts "Thanks for playing"
+  end 
 end 
 
 GameEngine.new.start 

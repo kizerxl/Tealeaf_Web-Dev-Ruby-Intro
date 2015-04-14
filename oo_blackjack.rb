@@ -2,7 +2,6 @@
 module Blackjack
   BLACKJACK = 21
   HITMAX = 17
-  HIT = 1
 end 
 
 class Player
@@ -17,16 +16,16 @@ class Player
   end 
   
   def <=>(other)
-    total = self.calculate_hand_total 
+    total = calculate_hand_total 
     other_total = other.calculate_hand_total
     
-      if total > other_total 
-        return 1 
-      elsif total == other_total 
-        return 0
-      else 
-        return -1
-      end
+    if total > other_total 
+      1 
+    elsif total == other_total 
+      0
+    else 
+      1
+    end
   end 
       
   def reset_hand
@@ -35,7 +34,7 @@ class Player
 
   def calculate_hand_total
     total = 0
-    card_values = self.hand.map{ |card| card[1] }
+    card_values = hand.map{ |card| card[1] }
     card_values.each do |value| 
       if value == "ACE"
         total += 11
@@ -53,22 +52,20 @@ class Player
   end 
   
   def add_card_to_hand
-    self.hand<< self.deck.draw_a_card
+    hand<< deck.draw_a_card
   end 
   
   def deal_two_cards
-    puts "\nTwo cards have been dealt to #{self}"
-    2.times{ add_card_to_hand}
-    puts"#{self} currently has: #{display_current_hand}."
-    puts"#{self}'s score is #{calculate_hand_total}\n\n"
+    puts "\nTwo cards have been dealt to #{name}"
+    2.times{ add_card_to_hand }
   end 
   
   def display_current_hand
-    hand_string = []
-    self.hand.each do |card|
-      hand_string<< "#{card[1]} of #{card[0]}"
+    current_hand = []
+    hand.each do |card|
+      current_hand<< "#{card[1]} of #{card[0]}"
     end 
-    hand_string = hand_string.join(", ")
+    current_hand.join(", ")
   end 
 
   def blackjack?
@@ -90,21 +87,27 @@ class Human < Player
     super 
     puts "Welcome to Blackjack\n\nPlease enter your name"
     @name = gets.chomp
-    puts "Let's begin #{self.name}..\n\n"
+    puts "Let's begin #{name}..\n\n"
   end
+
+  def deal_two_cards
+    super 
+    puts"#{name} currently has: #{display_current_hand}."
+    puts"#{name}'s score is #{calculate_hand_total}\n\n"
+  end 
   
   def hit_or_stay
-      begin
-        puts "\nEnter 1 to hit or 2 to stay "
-        user_option = gets.to_i
-        if user_option.to_i == HIT 
-          add_card_to_hand
-          puts"#{self} has hit.."
-          puts"#{self} currently has: #{display_current_hand}."
-          puts"#{self} score is #{calculate_hand_total}\n\n"
-        end
-      end until [2].include?(user_option) || calculate_hand_total >= BLACKJACK
-   end
+    begin
+      puts "\nEnter 1 to hit or 2 to stay "
+      user_option = gets.to_i
+      if user_option.to_i == 1
+        add_card_to_hand
+        puts "#{self} has hit.."
+        puts "#{self} currently has: #{display_current_hand}."
+        puts "#{self} score is #{calculate_hand_total}\n\n"
+      end
+    end until [2].include?(user_option) || calculate_hand_total >= BLACKJACK
+  end
 end 
 
 class Computer < Player
@@ -117,23 +120,9 @@ class Computer < Player
   def hit_or_stay
     begin
       add_card_to_hand
-      puts "\n#{self} has hit.."
-      puts"#{self} currently has: #{display_current_hand}."  
-      puts"#{self} score is #{calculate_hand_total}\n\n"
+      puts "\n#{name} has hit.."
     end until calculate_hand_total >= HITMAX 
   end
-  
-  def display_current_hand
-    hand_string = []
-    self.hand.each do |card|
-      if self.hand.last == card 
-        hand_string<< "#{card[1]} of #{card[0]}" 
-      else 
-        hand_string<< "hidden card"
-      end 
-    end
-    hand_string = hand_string.join(", ")
-  end 
 end 
 
 class Deck
@@ -147,11 +136,11 @@ class Deck
   end 
 
   def draw_a_card
-    self.deck.shuffle!.pop
+    deck.shuffle!.pop
   end 
 
   def reset_deck
-    self.deck = suit.product(type)
+    deck = suit.product(type)
   end 
 end
 
@@ -169,6 +158,8 @@ class Game
   end 
 
   def compare_hands
+    puts "#{@computer} has #{@computer.display_current_hand}"
+    puts "with a score of #{@computer.calculate_hand_total}"
     if @human.calculate_hand_total == @computer.calculate_hand_total
       puts "It's a tie"
     elsif @human.calculate_hand_total > @computer.calculate_hand_total
@@ -193,6 +184,8 @@ class Game
   end
 
   def display_blackjack_bust_message
+    puts "\n#{@computer} has #{@computer.display_current_hand}"
+    puts "with a score of #{@computer.calculate_hand_total}"
     if @human.blackjack? || @computer.blackjack?
       puts "#{@human.blackjack? ? @human : @computer} hits BLACKJACK!!"
       puts "#{@human.blackjack? ? @human : @computer} WINS!!!!"
@@ -208,24 +201,24 @@ class Game
 
   def start
     begin 
-        deal_first_cards
+      deal_first_cards
+      if (blackjack_or_bust?)
+        display_blackjack_bust_message
+      else 
+        @human.hit_or_stay 
         if (blackjack_or_bust?)
           display_blackjack_bust_message
         else 
-          @human.hit_or_stay 
+          @computer.hit_or_stay
           if (blackjack_or_bust?)
             display_blackjack_bust_message
-          else 
-            @computer.hit_or_stay
-            if (blackjack_or_bust?)
-              display_blackjack_bust_message
-            else
-              compare_hands
-            end
+          else
+            compare_hands
           end
-         end
-         again = play_again?
-         reset_game if again == 'y'
+        end
+      end
+    again = play_again?
+    reset_game if again == 'y'
     end until again.downcase == "n"
     puts "Thanks for playing!"
   end 

@@ -18,11 +18,11 @@ class Hand
   end 
 
   def <=> (other_hand)
-    if self.value == other_hand.value
+    if value == other_hand.value
       0
-    elsif ( (self.value == "R" && other_hand.value == "S") || 
-      (self.value == "P" && other_hand.value == "R")|| 
-      (self.value == "S" && other_hand.value == "P") )
+    elsif ( (value == "R" && other_hand.value == "S") || 
+      (value == "P" && other_hand.value == "R")|| 
+      (value == "S" && other_hand.value == "P") )
       1
     else 
       -1
@@ -30,17 +30,17 @@ class Hand
   end 
 
   def print_winning_message
-    if self.value == "P"
+    if value == "P"
       puts "Paper defeats Rock"
-    elsif self.value == "R"
+    elsif value == "R"
       puts "Rock smashed Scissors"
-    elsif self.value == "S"
+    elsif value == "S"
       puts "Scissors just a cut a new one in paper"
     end 
   end 
 
   def to_s
-    GameEngine::CHOICES[self.value]
+    GameEngine::CHOICES[value]
   end 
 end 
 
@@ -56,7 +56,7 @@ class Player
 end 
 
 class Human < Player
-  def initialize(name= "user")
+  def initialize(name="User")
     super
   end
 
@@ -65,13 +65,12 @@ class Human < Player
       puts "Please select R for Rock, P for Paper and S for Scissors"
       choice = gets.chomp.upcase 
     end until GameEngine::CHOICES.keys.include?(choice)
-
     @hand = Hand.new(choice)
   end 
 end 
 
 class Computer < Player
-    def initialize(name= "Computer") 
+  def initialize(name="Computer") 
     super(name)
   end 
 
@@ -81,9 +80,9 @@ class Computer < Player
 end 
 
 class GameEngine 
-    CHOICES = {"R" => "Rock", "P" => "Paper", "S" => "Scissors"}
+  CHOICES = {"R" => "Rock", "P" => "Paper", "S" => "Scissors"}
   attr_accessor :human, :computer
-  def initialize()
+  def initialize
     @human = Human.new
     @computer = Computer.new
   end 
@@ -101,7 +100,15 @@ class GameEngine
       puts "#{human.name} loses..."
     end
   end 
-  
+
+  def play_again?
+    begin
+    puts "\nPlay again(y/n):"
+    again = gets.chomp.upcase 
+    end until ['Y', 'N'].include? again 
+    again
+  end 
+
   def start
     puts "Let's play Paper, Rock, Scissors"
     puts "What is your name?"
@@ -110,9 +117,8 @@ class GameEngine
       human.play 
       computer.play 
       get_winner
-      puts "\nPlay again(y/n):"
-      again = gets.chomp.upcase 
-    end until again != "Y"
+      again = play_again?
+    end while again == 'Y'
   end 
 end  
 
